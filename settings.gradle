@@ -1,1 +1,4 @@
-include ':app', ':lazyparselib'
+if (!System.env.JITPACK)
+    include ':app'
+
+include ':lazyparselib'
