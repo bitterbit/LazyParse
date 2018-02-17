@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         WordListInfiniteAdapter adapter = new WordListInfiniteAdapter(this, list);
         ListView listView = findViewById(R.id.list_view);
         listView.setAdapter(adapter);
+        listView.setOnScrollListener(new ScrollInfiniteListener(adapter));
     }
 
     private LazyList<WordLazy> newStyle(){

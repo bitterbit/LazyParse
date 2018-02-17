@@ -18,7 +18,7 @@ import android.widget.TextView;
 public class WordListInfiniteAdapter extends ScrollInfiniteAdapter<WordLazy> {
 
     public WordListInfiniteAdapter(Context context, LazyList<WordLazy> list){
-        super(context, list, android.R.layout.simple_list_item_1, 10);
+        super(context, list, android.R.layout.simple_list_item_1, 20);
     }
 
     @Override
