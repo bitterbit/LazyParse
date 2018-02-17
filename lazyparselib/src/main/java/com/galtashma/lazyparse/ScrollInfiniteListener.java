@@ -1,6 +1,5 @@
 package com.galtashma.lazyparse;
 
-import android.util.Log;
 import android.widget.AbsListView;
 
 public class ScrollInfiniteListener implements AbsListView.OnScrollListener {
@@ -19,8 +18,6 @@ public class ScrollInfiniteListener implements AbsListView.OnScrollListener {
     }
 
     @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        Log.d("LazyParse", "onScrollStateChanged. state: "+scrollState);
-    }
+    public void onScrollStateChanged(AbsListView view, int scrollState) {}
 
 }
