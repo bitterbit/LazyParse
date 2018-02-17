@@ -70,9 +70,11 @@ public abstract class ScrollInfiniteAdapter<T extends LazyParseObject>
     public void showMore(){
         if (shouldShowMore()){
             Log.i(TAG, "trying to show more");
-            for (int i=getCount(); i<stepSize; i++){
+            int currentCount = getCount();
+            for (int i=currentCount ; i<currentCount+stepSize; i++){
                 LazyParseObjectHolder<T> holder = valuesGenerator.get(i);
                 holder.setListener(this);
+                Log.i(TAG, "got lazy object "+ holder);
                 add(holder);
             }
             notifyDataSetChanged(); //notify when the data count has changes.
@@ -107,5 +109,9 @@ public abstract class ScrollInfiniteAdapter<T extends LazyParseObject>
     public void onReady(T object) {
         Log.d(TAG, "on data ready " + object);
         notifyDataSetChanged(); // An object was fetched, refresh view
+    }
+
+    public boolean hasEndReached() {
+        return isEnd(getCount());
     }
 }
