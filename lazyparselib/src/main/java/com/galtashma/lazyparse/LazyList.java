@@ -114,6 +114,11 @@ public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseOb
     public void done(List<T> objects, ParseException e) {
         // TODO: maybe this should be synced
 
+        if (e != null){
+            Log.e(TAG, "Error on fetch done", e);
+            return;
+        }
+
         Log.d(TAG, "done fetching " + objects.size() + " objects");
 
         for (T obj : objects){
@@ -136,6 +141,12 @@ public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseOb
         query.countInBackground(new CountCallback() {
             @Override
             public void done(int count, ParseException e) {
+
+                if(e != null){
+                    Log.e(TAG, "Error on fetch count done", e);
+                    return;
+                }
+
                 Log.d(TAG, "query has count of " + count);
                 queryPotentialCount = count;
 
