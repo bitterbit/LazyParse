@@ -1,5 +1,7 @@
 package com.galtashma.lazyparse;
 
+import android.util.Log;
+
 import com.parse.ParseObject;
 
 /**
@@ -7,6 +9,9 @@ import com.parse.ParseObject;
  */
 
 public class LazyParseObjectHolder<T extends LazyParseObject> {
+
+    public static final String TAG = "LazyParse";
+
     private T object = null;
     private State state = State.NOT_INITIALIZED;
     private OnReadyListener<T> listener = null;
@@ -24,10 +29,6 @@ public class LazyParseObjectHolder<T extends LazyParseObject> {
     }
 
     public T get(){
-        if (object == null){
-            return null;
-        }
-
         return object;
     }
 
@@ -36,14 +37,25 @@ public class LazyParseObjectHolder<T extends LazyParseObject> {
     }
 
     void onFetchResolved(T object){
+        Log.i(TAG, "onFetchResolved");
         this.state = State.READY;
         this.object = object;
         if (this.listener != null){
+            Log.d(TAG, "calling listener");
             this.listener.onReady(this.object);
         }
     }
 
     public void setListener(OnReadyListener<T> listener){
         this.listener = listener;
+    }
+
+    public String toString(){
+        String msg = "LazyObject state: " + getState();
+        if (this.getState() == State.READY) {
+            msg += " obj: " + this.object.toString();
+        }
+
+        return msg;
     }
 }

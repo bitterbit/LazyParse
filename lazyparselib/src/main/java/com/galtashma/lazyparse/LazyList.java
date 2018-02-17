@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
  * Created by gal on 2/15/18.
  */
 
-public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseObjectHolder<T>>, FindCallback<T> {
+public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseObjectHolder<T>>, FindCallback<T>  {
     
     private static int BATCH_SIZE = 5;
     public static final String TAG = "LazyParse";
@@ -125,7 +125,7 @@ public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseOb
                 liveObjects.add(new LazyParseObjectHolder<T>());
             }
 
-            this.liveObjects.get(lastFetchedIndex).onFetchResolved(obj);;
+            this.liveObjects.get(lastFetchedIndex).onFetchResolved(obj);
             lastFetchedIndex++;
         }
     }

@@ -3,15 +3,10 @@ package com.galtashma.lazyparse;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
-import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         LazyList<WordLazy> list = newStyle();
-        WordListAdapter adapter = new WordListAdapter(this, list);
+        WordListInfiniteAdapter adapter = new WordListInfiniteAdapter(this, list);
         ListView listView = findViewById(R.id.list_view);
         listView.setAdapter(adapter);
     }
