@@ -8,6 +8,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,31 +19,37 @@ import java.util.NoSuchElementException;
 
 public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseObjectHolder<T>>, FindCallback<T>  {
     
-    private static int BATCH_SIZE = 5;
+    private static int DEFAULT_STEP_SIZE = 5;
     public static final String TAG = "LazyParse";
 
-    private int queryPotentialCount = -1;
+    private int stepSize = DEFAULT_STEP_SIZE;
     private int lastFetchedIndex = 0;
+    private int queryPotentialCount = -1;
+
     private ParseQuery<T> query;
     private List<LazyParseObjectHolder<T>> liveObjects;
 
-
-    public LazyList(ParseQuery<T> query){
+    public LazyList(ParseQuery<T> query, int stepSize){
         this.query = query;
-        this.liveObjects = new ArrayList<>();
-        fetchNAsync(BATCH_SIZE);
+        this.stepSize = stepSize;
+        this.liveObjects = Collections.synchronizedList(new ArrayList<LazyParseObjectHolder<T>>());
+        fetchNAsync(stepSize);
         fetchQueryCount();
     }
 
+    public LazyList(ParseQuery<T> query){
+        this(query, DEFAULT_STEP_SIZE);
+    }
 
     class LazyParseIterator implements Iterator<LazyParseObjectHolder<T>>{
         int current = 0;
 
         @Override
         public boolean hasNext() {
-            // TODO: when to stop?
-            // Allow to set limit by user
-            // When there are no more lines in table
+            if (queryPotentialCount >= 0 && current > queryPotentialCount){
+                return false;
+            }
+
             return true;
         }
 
@@ -82,7 +89,7 @@ public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseOb
         }
 
         int toFetch = index - this.liveObjects.size()-1;
-        fetchNAsync(Math.max(toFetch, BATCH_SIZE)); // fetch at least min batch size
+        fetchNAsync(Math.max(toFetch, stepSize)); // fetch at least min batch size
 
         return this.liveObjects.get(index);
     }
@@ -148,6 +155,8 @@ public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseOb
                 }
 
                 Log.d(TAG, "query has count of " + count);
+
+
                 queryPotentialCount = count;
 
                 if (liveObjects.size() > count) {
