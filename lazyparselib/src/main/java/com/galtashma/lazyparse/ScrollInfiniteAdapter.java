@@ -3,6 +3,7 @@ package com.galtashma.lazyparse;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -16,6 +17,7 @@ public abstract class ScrollInfiniteAdapter<T extends LazyParseObject>
     // Lazy Data objects to be shown in the list when needed
     private LazyList<T> valuesGenerator;
     private int stepSize;
+    private int rowLayout;
 
     /**
      * C'tor
@@ -26,6 +28,7 @@ public abstract class ScrollInfiniteAdapter<T extends LazyParseObject>
     public ScrollInfiniteAdapter(Context context, LazyList<T> lazyValues, int rowLayout, int stepSize) {
         super(context, rowLayout);
         this.valuesGenerator = lazyValues;
+        this.rowLayout = rowLayout;
         this.stepSize = stepSize;
 
         showMore();
@@ -37,7 +40,29 @@ public abstract class ScrollInfiniteAdapter<T extends LazyParseObject>
      */
     @NonNull
     @Override
-    public abstract View getView(int position, View convertView, @NonNull ViewGroup parent);
+    public View getView(int position, View convertView, @NonNull ViewGroup parent){
+        LazyParseObjectHolder<T> lazyObject = getItem(position);
+
+        if (lazyObject == null){
+            Log.w(TAG, "getItem at position " + position + " returned null");
+            return convertView;
+        }
+
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(rowLayout, parent, false);
+        }
+
+        if (lazyObject.getState() == LazyParseObjectHolder.State.READY) {
+            return renderReadyLazyObject(lazyObject.get(), convertView, parent);
+        }
+
+        return renderLoadingLazyObject(lazyObject, convertView, parent);
+    }
+
+
+    public abstract View renderReadyLazyObject(T object, View convertView, @NonNull ViewGroup parent);
+    public abstract View renderLoadingLazyObject(LazyParseObjectHolder<T> object, View convertView, @NonNull ViewGroup parent);
+
 
     /**
      * Try to show more list entries if any available

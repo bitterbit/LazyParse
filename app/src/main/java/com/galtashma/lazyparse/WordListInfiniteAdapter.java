@@ -21,34 +21,19 @@ public class WordListInfiniteAdapter extends ScrollInfiniteAdapter<WordLazy> {
         super(context, list, android.R.layout.simple_list_item_1, 10);
     }
 
-    @NonNull
     @Override
-    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        LazyParseObjectHolder<WordLazy> wordLazy = getItem(position);
-        Log.i("MAIN", "get view " + position + ", lazy object " + wordLazy);
-
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
-        }
-
+    public View renderReadyLazyObject(WordLazy word, @NonNull View convertView, @NonNull ViewGroup parent) {
         final TextView tv = convertView.findViewById(android.R.id.text1);
         tv.setTextColor(Color.BLACK);
-        if (wordLazy.getState() == LazyParseObjectHolder.State.READY) {
-            handleWordReady(tv, wordLazy);
-        } else {
-            handleWordFetching(tv, wordLazy);
-        }
-
+        tv.setText(word.getWord());
         return convertView;
     }
 
-    private void handleWordReady(TextView tv, LazyParseObjectHolder<WordLazy> wordLazy){
-        Log.d("MAIN", "handle word ready " + wordLazy);
-        tv.setText(wordLazy.get().getWord());
-    }
-
-    private void handleWordFetching(final TextView tv, LazyParseObjectHolder<WordLazy> wordLazy){
-        Log.d("MAIN", "handle word loading " + wordLazy);
+    @Override
+    public View renderLoadingLazyObject(LazyParseObjectHolder<WordLazy> object, @NonNull View convertView, @NonNull ViewGroup parent) {
+        final TextView tv = convertView.findViewById(android.R.id.text1);
+        tv.setTextColor(Color.BLACK);
         tv.setText("Loading...");
+        return convertView;
     }
 }
