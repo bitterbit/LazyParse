@@ -1,3 +1,6 @@
+# Parse credentials
+/app/src/main/res/values/parse.xml
+
 *.iml
 .gradle
 /local.properties
