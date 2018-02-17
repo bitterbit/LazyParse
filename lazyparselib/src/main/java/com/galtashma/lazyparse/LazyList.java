@@ -119,21 +119,21 @@ public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseOb
 
     @Override
     public void done(List<T> objects, ParseException e) {
-        // TODO: maybe this should be synced
-
         if (e != null){
             Log.e(TAG, "Error on fetch done", e);
             return;
         }
 
         Log.d(TAG, "done fetching " + objects.size() + " objects");
+        addFetchedObjects(objects);
+    }
 
+    private synchronized void addFetchedObjects(List<T> objects){
         for (T obj : objects){
-
-            Log.d(TAG, "done fetching object " + lastFetchedIndex);
+            Log.d(TAG, "adding fetched object " + lastFetchedIndex);
 
             if (liveObjects.size() <= lastFetchedIndex){
-                Log.w(TAG, "trying to finish fetching an object that wasn't in liveobjects");
+                Log.w(TAG, "trying to finish fetching an object that wasn't in live objects");
                 liveObjects.add(new LazyParseObjectHolder<T>());
             }
 
