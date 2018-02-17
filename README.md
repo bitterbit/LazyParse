@@ -1,4 +1,6 @@
 # [Alpha] LazyParse
-Helper for parse-sdk making loading and using parse objects easy
+Helper for parse-sdk making loading and using parse objects easy  
 
-![raw/images/demolist.gif](demo list gif)
+Demo
+-----------
+<img src="https://github.com/bitterbit/LazyParse/raw/master/images/demolist.gif" width=200>
