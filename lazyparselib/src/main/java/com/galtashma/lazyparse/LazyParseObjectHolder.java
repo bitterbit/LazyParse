@@ -16,7 +16,7 @@ public class LazyParseObjectHolder<T extends LazyParseObject> {
     private State state = State.NOT_INITIALIZED;
     private OnReadyListener<T> listener = null;
 
-    interface OnReadyListener<T> {
+    public interface OnReadyListener<T> {
         void onReady(T object);
     }
 
