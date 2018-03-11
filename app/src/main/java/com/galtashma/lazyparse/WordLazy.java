@@ -1,21 +1,18 @@
 package com.galtashma.lazyparse;
 
 import com.parse.ParseClassName;
+import com.parse.ParseObject;
 
 /**
  * Created by gal on 2/15/18.
  */
 
 @ParseClassName("Word")
-public class WordLazy extends LazyParseObject {
+public class WordLazy extends ParseObject implements LazyParseObject {
 
     public String getWord(){
         return getString("value");
     }
-
-//    public String getCategory(){
-//        return getString("category_id");
-//    }
 
     public int getLevel(){
         return getInt("level");

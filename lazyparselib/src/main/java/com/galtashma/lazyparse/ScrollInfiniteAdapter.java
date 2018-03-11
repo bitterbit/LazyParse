@@ -8,7 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-public abstract class ScrollInfiniteAdapter<T extends LazyParseObject>
+import com.parse.Parse;
+import com.parse.ParseObject;
+
+public abstract class ScrollInfiniteAdapter<T extends ParseObject & LazyParseObject>
         extends ArrayAdapter<LazyParseObjectHolder<T>>
         implements LazyParseObjectHolder.OnReadyListener<T> {
 

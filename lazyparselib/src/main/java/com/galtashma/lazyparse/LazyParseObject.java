@@ -8,5 +8,5 @@ import com.parse.ParseObject;
  */
 
 
-public class LazyParseObject extends ParseObject {
+public interface LazyParseObject {
 }

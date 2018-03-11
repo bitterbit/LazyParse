@@ -6,6 +6,7 @@ import android.util.Log;
 import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +18,7 @@ import java.util.NoSuchElementException;
  * Created by gal on 2/15/18.
  */
 
-public class LazyList<T extends LazyParseObject> implements Iterable<LazyParseObjectHolder<T>>, FindCallback<T>  {
+public class LazyList<T extends ParseObject & LazyParseObject> implements Iterable<LazyParseObjectHolder<T>>, FindCallback<T>  {
     
     private static int DEFAULT_STEP_SIZE = 5;
     public static final String TAG = "LazyParse";
