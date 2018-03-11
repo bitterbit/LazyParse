@@ -7,7 +7,20 @@ Demo
 
 Installation
 -----------
+Root gradle.build
 ``` gradle
+repositories {
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+```
+
+App gradle.build
+``` gradle
+compile ('com.github.bitterbit:LazyParse:1ff5ff65a0') {
+    exclude group: 'com.android.support'
+}
 ```
 
 Usage
