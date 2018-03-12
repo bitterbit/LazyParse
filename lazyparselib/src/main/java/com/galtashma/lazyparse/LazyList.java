@@ -14,6 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import bolts.Continuation;
+import bolts.Task;
+
 /**
  * Created by gal on 2/15/18.
  */
@@ -26,16 +29,20 @@ public class LazyList<T extends ParseObject & LazyParseObject> implements Iterab
     private int stepSize = DEFAULT_STEP_SIZE;
     private int lastFetchedIndex = 0;
     private int queryPotentialCount = -1;
+    private boolean blockUntilFetchedCount;
 
     private ParseQuery<T> query;
     private List<LazyParseObjectHolder<T>> liveObjects;
+    private Task<Integer> fetchCountTask = null;
 
     public LazyList(ParseQuery<T> query, int stepSize){
         this.query = query;
         this.stepSize = stepSize;
         this.liveObjects = Collections.synchronizedList(new ArrayList<LazyParseObjectHolder<T>>());
+        this.blockUntilFetchedCount = true;
         fetchNAsync(stepSize);
-        fetchQueryCount();
+
+        fetchCountTask = fetchQueryCount();
     }
 
     public LazyList(ParseQuery<T> query){
@@ -47,11 +54,7 @@ public class LazyList<T extends ParseObject & LazyParseObject> implements Iterab
 
         @Override
         public boolean hasNext() {
-            if (queryPotentialCount >= 0 && current > queryPotentialCount){
-                return false;
-            }
-
-            return true;
+            return isInBounds(current);
         }
 
         @Override
@@ -81,7 +84,39 @@ public class LazyList<T extends ParseObject & LazyParseObject> implements Iterab
     }
 
     public LazyParseObjectHolder<T> get(int index){
-        return internalGet(index);
+        if (isInBounds(index)) {
+            return internalGet(index);
+        }
+
+        return null;
+    }
+
+    // Check whether the given index is the bounds of our collection.
+    // May block until the total object count is returned from the server.
+    // See blockUntilFetchedCount flag.
+    private boolean isInBounds(int index){
+        if (!blockUntilFetchedCount && !fetchCountTask.isCompleted()){
+            // We don't know if the index is in bounds, we will know better after queryPotential is populated
+            // For now just return true
+            return true;
+        }
+
+        if (fetchCountTask.isCompleted()) {
+            return index < queryPotentialCount;
+        }
+
+        this.waitForFetchCount();
+        return index < queryPotentialCount;
+    }
+
+    // Wait for the fetch count task to complete, safely.
+    private void waitForFetchCount(){
+        try {
+            fetchCountTask.waitForCompletion();
+        } catch (InterruptedException e) {
+            Log.w(TAG, "Waiting for fetch count raised error", e);
+            e.printStackTrace();
+        }
     }
 
     private LazyParseObjectHolder<T> internalGet(int index){
@@ -143,37 +178,35 @@ public class LazyList<T extends ParseObject & LazyParseObject> implements Iterab
         }
     }
 
-    private void fetchQueryCount(){
+    private Task<Integer> fetchQueryCount(){
         query.setSkip(0);
         query.setLimit(-1); // unlimited
-        query.countInBackground(new CountCallback() {
+
+        Task<Integer> task = query.countInBackground();
+        task.continueWith(new Continuation<Integer, Integer>() {
             @Override
-            public void done(int count, ParseException e) {
+            public Integer then(Task<Integer> task) throws Exception {
+                if (task.isFaulted()){
+                    Log.e(TAG, "Error on fetch count done", task.getError());
+                    throw task.getError();
+                }
+                queryPotentialCount = task.getResult();
+                return task.getResult();
+            }
+        }).onSuccess(new Continuation<Integer, Void>() {
+            @Override
+            public Void then(Task<Integer> task) throws Exception {
+                int parseObjectsCount = task.getResult();
+                int numObjectsToRemove = parseObjectsCount - liveObjects.size();
 
-                if(e != null){
-                    Log.e(TAG, "Error on fetch count done", e);
-                    return;
+                if (numObjectsToRemove > 0){
+                    Log.d(TAG, "To many live objects, some will never be fetched");
                 }
 
-                Log.d(TAG, "query has count of " + count);
-
-
-                queryPotentialCount = count;
-
-                if (liveObjects.size() > count) {
-                    Log.w(TAG, "more live lazy objects than the queries potential");
-
-                    // Remove all objects that should die
-                    for (int i=queryPotentialCount; i<liveObjects.size(); i++){
-
-                        // Object should have been waiting forever to fetch but instead is ready. Someone is lying
-                        if (liveObjects.remove(i).getState() == LazyParseObjectHolder.State.READY){
-                            Log.w(TAG, "live object removed due low query potential size but was READY and not FETCHING");
-                        }
-                    }
-
-                }
+                return null;
             }
         });
+
+        return task;
     }
 }
