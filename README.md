@@ -27,3 +27,7 @@ Usage
 -----------
 ``` java
 ```
+
+Troubleshoot
+-----------
+In case of the error   `java.lang.ClassCastException: com.parse.ParseObject cannot be cast to com.galtashma.lazyparse.LazyParseObject`, check that you have not forgotten to call `ParseOject.registerSubclass(YourClass.class);`
