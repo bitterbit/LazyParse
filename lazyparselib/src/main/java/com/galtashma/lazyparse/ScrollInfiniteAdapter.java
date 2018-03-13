@@ -114,6 +114,11 @@ public abstract class ScrollInfiniteAdapter<T extends ParseObject & LazyParseObj
         notifyDataSetChanged(); // An object was fetched, refresh view
     }
 
+    public void onDeleted(LazyParseObjectHolder<T> holder){
+        Log.d(TAG, "removed LazyParseObjectHolder from ListView after it was deleted");
+        remove(holder);
+    }
+
     public boolean hasEndReached() {
         return isEnd(getCount());
     }
