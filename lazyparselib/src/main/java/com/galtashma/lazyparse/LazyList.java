@@ -75,11 +75,11 @@ public class LazyList<T extends ParseObject & LazyParseObject> implements Iterab
         return new LazyParseIterator();
     }
 
-    public int fetchedSize(){
-        return lastFetchedIndex;
-    }
-
     public int getLimit(){
+        if (blockUntilFetchedCount){
+            waitForFetchCount();
+        }
+
         return queryPotentialCount;
     }
 
@@ -94,7 +94,7 @@ public class LazyList<T extends ParseObject & LazyParseObject> implements Iterab
     // Check whether the given index is the bounds of our collection.
     // May block until the total object count is returned from the server.
     // See blockUntilFetchedCount flag.
-    private boolean isInBounds(int index){
+    public boolean isInBounds(int index){
         if (!blockUntilFetchedCount && !fetchCountTask.isCompleted()){
             // We don't know if the index is in bounds, we will know better after queryPotential is populated
             // For now just return true

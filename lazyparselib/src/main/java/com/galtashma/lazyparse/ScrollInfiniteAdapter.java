@@ -66,46 +66,24 @@ public abstract class ScrollInfiniteAdapter<T extends ParseObject & LazyParseObj
     public abstract View renderReadyLazyObject(T object, View convertView, @NonNull ViewGroup parent);
     public abstract View renderLoadingLazyObject(LazyParseObjectHolder<T> object, View convertView, @NonNull ViewGroup parent);
 
-
     /**
      * Try to show more list entries if any available
      */
     public void showMore(){
-        if (shouldShowMore()){
-            Log.i(TAG, "trying to show more");
-            int currentCount = getCount();
-            for (int i=currentCount ; i<currentCount+stepSize; i++){
-                LazyParseObjectHolder<T> holder = valuesGenerator.get(i);
-                holder.setListener(this);
-                Log.i(TAG, "got lazy object "+ holder);
-                add(holder);
-            }
+        Log.i(TAG, "trying to show more");
+        boolean changed = false;
+        int currentCount = getCount();
+        for (int i=currentCount ; i<currentCount+stepSize && valuesGenerator.isInBounds(i); i++){
+            LazyParseObjectHolder<T> holder = valuesGenerator.get(i);
+            holder.setListener(this);
+            Log.i(TAG, "got lazy object "+ holder);
+            add(holder);
+            changed = true;
+        }
+
+        if (changed) {
             notifyDataSetChanged(); //notify when the data count has changes.
         }
-    }
-
-    /**
-     * @return If the valuesGenerator list have more data to shown return true, against of this return false
-     */
-    private boolean shouldShowMore(){
-        int limit = valuesGenerator.getLimit();
-        if (limit < 0){
-            return true;
-        }
-
-        if(getCount() >= limit) {
-            return false;
-        }
-
-        int count = Math.min(getCount() + stepSize, valuesGenerator.getLimit()); //don't go past the end
-        return !isEnd(count);
-    }
-
-    /**
-     * @return true if then entire data set is being displayed, false otherwise
-     */
-    private boolean isEnd(int count){
-        return count == valuesGenerator.getLimit();
     }
 
     @Override
@@ -120,6 +98,14 @@ public abstract class ScrollInfiniteAdapter<T extends ParseObject & LazyParseObj
     }
 
     public boolean hasEndReached() {
-        return isEnd(getCount());
+        if (valuesGenerator.getLimit() > -1){
+            if (getCount() < valuesGenerator.getLimit()){
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

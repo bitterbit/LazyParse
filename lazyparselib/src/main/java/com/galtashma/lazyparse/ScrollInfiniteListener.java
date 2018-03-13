@@ -12,9 +12,12 @@ public class ScrollInfiniteListener implements AbsListView.OnScrollListener {
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         //check if we've reached the bottom
-        if(firstVisibleItem + visibleItemCount == totalItemCount && !adapter.hasEndReached()){
+        if(hasReachedBottom(firstVisibleItem, visibleItemCount, totalItemCount) && !adapter.hasEndReached()){
             adapter.showMore();
         }
+    }
+    private boolean hasReachedBottom(int firstVisibleItem, int visibleItemCount, int totalItemCount){
+        return firstVisibleItem + visibleItemCount == totalItemCount;
     }
 
     @Override
