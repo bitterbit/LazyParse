@@ -62,7 +62,7 @@ listView.setOnScrollListener(new ScrollInfiniteListener(adapter));
 
 #### Rendering the objects according to thier state
 ``` java
-class A<T extends ParseObject> extends ScrollInfiniteAdapter {
+class CustomRenderAdapter <T extends ParseObject> extends ScrollInfiniteAdapter {
         
     public A(Context context, LazyList lazyValues) {
         // Change the layout and stepSize values to change your adapters behaviour
