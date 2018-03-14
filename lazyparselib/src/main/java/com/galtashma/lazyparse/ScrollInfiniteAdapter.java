@@ -15,12 +15,18 @@ public abstract class ScrollInfiniteAdapter<T extends ParseObject>
         extends ArrayAdapter<LazyParseObjectHolder<T>>
         implements LazyParseObjectHolder.OnReadyListener<T> {
 
+    public interface OnClickListener<T> {
+        void onClick(T object);
+    }
+
     public static final String TAG = "LazyParse";
 
     // Lazy Data objects to be shown in the list when needed
     private LazyList<T> valuesGenerator;
     private int stepSize;
     private int rowLayout;
+
+    private OnClickListener<T> listener;
 
     /**
      * C'tor
@@ -44,7 +50,7 @@ public abstract class ScrollInfiniteAdapter<T extends ParseObject>
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent){
-        LazyParseObjectHolder<T> lazyObject = getItem(position);
+        final LazyParseObjectHolder<T> lazyObject = getItem(position);
 
         if (lazyObject == null){
             Log.w(TAG, "getItem at position " + position + " returned null");
@@ -56,7 +62,15 @@ public abstract class ScrollInfiniteAdapter<T extends ParseObject>
         }
 
         if (lazyObject.getState() == LazyParseObjectHolder.State.READY) {
-            return renderReadyLazyObject(lazyObject.get(), convertView, parent);
+            final T object = lazyObject.get();
+
+            convertView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    notifyOnClickListener(object);
+                }
+            });
+            return renderReadyLazyObject(object, convertView, parent);
         }
 
         return renderLoadingLazyObject(lazyObject, convertView, parent);
@@ -107,5 +121,15 @@ public abstract class ScrollInfiniteAdapter<T extends ParseObject>
         }
 
         return false;
+    }
+
+    public void setOnClickListener(OnClickListener<T> listener){
+        this.listener = listener;
+    }
+
+    protected void notifyOnClickListener(T object){
+        if(listener != null){
+            listener.onClick(object);
+        }
     }
 }
