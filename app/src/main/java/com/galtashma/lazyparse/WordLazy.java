@@ -8,7 +8,7 @@ import com.parse.ParseObject;
  */
 
 @ParseClassName("Word")
-public class WordLazy extends ParseObject implements LazyParseObject {
+public class WordLazy extends ParseObject {
 
     public String getWord(){
         return getString("value");

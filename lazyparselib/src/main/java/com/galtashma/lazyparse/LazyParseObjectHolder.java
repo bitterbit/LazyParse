@@ -2,14 +2,13 @@ package com.galtashma.lazyparse;
 
 import android.os.Handler;
 import android.util.Log;
-
 import com.parse.ParseObject;
 
 /**
  * Created by gal on 2/13/18.
  */
 
-public class LazyParseObjectHolder<T extends LazyParseObject> {
+public class LazyParseObjectHolder<T extends ParseObject> {
 
     public static final String TAG = "LazyParse";
     private static final int TIMEOUT = 5000;
@@ -20,11 +19,11 @@ public class LazyParseObjectHolder<T extends LazyParseObject> {
 
     private Handler loadingTimeout;
 
-    public interface OnReadyListener<T extends LazyParseObject> {
-        // Will be called when the LazyParseObject has been fetched
+    public interface OnReadyListener<T extends ParseObject> {
+        // Will be called when the ParseObject has been fetched
         void onReady(T object);
 
-        // Called in case there is no actual ParseObject to load to the given LazyParseObject
+        // Called in case there is no actual ParseObject to load to the given ParseObject
         void onDeleted(LazyParseObjectHolder<T> holder);
     }
 

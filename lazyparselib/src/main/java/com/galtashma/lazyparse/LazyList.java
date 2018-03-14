@@ -21,7 +21,7 @@ import bolts.Task;
  * Created by gal on 2/15/18.
  */
 
-public class LazyList<T extends ParseObject & LazyParseObject> implements Iterable<LazyParseObjectHolder<T>>, FindCallback<T>  {
+public class LazyList<T extends ParseObject> implements Iterable<LazyParseObjectHolder<T>>, FindCallback<T>  {
     
     private static int DEFAULT_STEP_SIZE = 5;
     public static final String TAG = "LazyParse";
